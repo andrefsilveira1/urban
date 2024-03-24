@@ -11,5 +11,5 @@ func Auth(c *fiber.Ctx) error {
 	fmt.Println("HEADER:", header)
 	// TODO
 
-	return c.Next()
+	return nil
 }
