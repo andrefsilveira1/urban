@@ -3,9 +3,12 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"golang.org/x/sync/errgroup"
 )
 
 func main() {
@@ -23,5 +26,22 @@ func main() {
 	ctx := context.Background()
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
+
+	g, ctx := errgroup.WithContext(ctx)
+
+	g.Go(func() (err error) {
+		fmt.Println("Server started")
+		// Start rest server here
+		return
+	})
+
+	select {
+	case <-interrupt:
+		break
+	case <-ctx.Done():
+		break
+	}
+
+	log.Println("Shutdown signal received")
 
 }
