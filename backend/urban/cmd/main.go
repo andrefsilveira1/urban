@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/andrefsilveira1/urban/internal/transport/rest"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -32,7 +33,11 @@ func main() {
 
 	g.Go(func() (err error) {
 		fmt.Println("Server started")
+		err = rest.Start(3000)
 		// Start rest server here
+		if err != nil {
+			panic(err)
+		}
 		return
 	})
 
