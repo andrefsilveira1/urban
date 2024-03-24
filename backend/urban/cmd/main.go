@@ -62,3 +62,7 @@ func main() {
 	log.Println("Shutdown")
 
 }
+
+// load config
+
+// load database
