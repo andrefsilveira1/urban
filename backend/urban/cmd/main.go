@@ -21,6 +21,9 @@ func main() {
 
 	// Shutdown
 
+	// Create Dependency injection here {}
+	// {}
+
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
 	defer signal.Stop(interrupt)
