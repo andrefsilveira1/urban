@@ -6,5 +6,3 @@ type User struct {
 	Email    string
 	Password string
 }
-
-// Define methods for your domain entities here...
