@@ -1,15 +1,12 @@
 package repository
 
-type User struct {
-	ID       string
-	Name     string
-	Email    string
-	Password string
-}
+import (
+	"github.com/andrefsilveira1/urban/internal/domain/models"
+)
 
 type UserRepository interface {
-	Save(user *User) error
-	Get(id string) (*User, error)
+	Save(user *models.User) error
+	Get(id string) (models.User, error)
 	// more methods
 }
 
@@ -17,13 +14,13 @@ type ScyllaRepository struct {
 	// Scylla init
 }
 
-func (r *ScyllaRepository) Save(User *User) error {
+func (r *ScyllaRepository) Save(User *models.User) error {
 	// Save logic
 
 	return nil
 }
 
-func (r *ScyllaRepository) Get(id string) (*User, error) {
+func (r *ScyllaRepository) Get(id string) (*models.User, error) {
 	// Get logic
 
 	return nil, nil
