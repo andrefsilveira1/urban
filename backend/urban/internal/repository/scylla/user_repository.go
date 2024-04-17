@@ -6,7 +6,7 @@ import (
 
 type UserRepository interface {
 	Save(user *models.User) error
-	Get(id string) (models.User, error)
+	Get(id string) (*models.User, error)
 	// more methods
 }
 

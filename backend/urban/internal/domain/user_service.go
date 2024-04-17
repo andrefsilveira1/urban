@@ -23,3 +23,13 @@ func (s *UserService) Register(name, email, password string) (*models.User, erro
 
 	return user, nil
 }
+
+func (s *UserService) Get(id string) (*models.User, error) {
+	user, err := s.userRepository.Get(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+
+}
