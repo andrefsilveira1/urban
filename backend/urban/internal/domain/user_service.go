@@ -33,3 +33,12 @@ func (s *UserService) Get(id string) (*models.User, error) {
 	return user, nil
 
 }
+
+func (s *UserService) List() (*[]models.User, error) {
+	users, err := s.userRepository.List()
+	if err != nil {
+		return nil, err
+	}
+
+	return users, nil
+}
