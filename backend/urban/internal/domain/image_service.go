@@ -24,3 +24,12 @@ func (s *ImageService) Register(name string, date time.Time, content []byte) err
 
 	return nil
 }
+
+func (s *ImageService) Get(id string) (*models.Image, error) {
+	image, err := s.imageRepository.Get(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return image, nil
+}
