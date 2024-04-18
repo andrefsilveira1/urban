@@ -6,5 +6,7 @@ type ImageRepository interface {
 	Save(image *models.Image) error
 	Get(id string) (*models.Image, error)
 	List() (*[]models.Image, error)
+	Delete(id string) error
+	HashImage(image *models.Image) (*[]models.Image, error)
 	// ...
 }
