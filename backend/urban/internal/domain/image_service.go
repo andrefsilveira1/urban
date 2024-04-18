@@ -42,3 +42,12 @@ func (s *ImageService) List() (*[]models.Image, error) {
 
 	return images, nil
 }
+
+func (s *ImageService) Delete(id string) error {
+	err := s.imageRepository.Delete(id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
