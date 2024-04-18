@@ -33,3 +33,12 @@ func (s *ImageService) Get(id string) (*models.Image, error) {
 
 	return image, nil
 }
+
+func (s *ImageService) List() (*[]models.Image, error) {
+	images, err := s.imageRepository.List()
+	if err != nil {
+		return nil, err
+	}
+
+	return images, nil
+}
