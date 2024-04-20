@@ -18,7 +18,7 @@ func Register(c *fiber.Ctx, userService *domain.UserService) error {
 		})
 	}
 
-	err := userService.Register(user.Name string, user.Email string, user.Password string)
+	err := userService.Register(user.Name, user.Email, user.Password)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Invalid request body",
@@ -26,4 +26,17 @@ func Register(c *fiber.Ctx, userService *domain.UserService) error {
 	}
 
 	return c.JSON("User created")
+}
+
+func GetUser(c *fiber.Ctx, userService *domain.UserService) error {
+	id := c.Params("id")
+	user, err := userService.Get(id)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.JSON(user)
+
 }
