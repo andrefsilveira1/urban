@@ -9,7 +9,7 @@ type UserService struct {
 	userRepository repository.UserRepository
 }
 
-func (s *UserService) Register(name, email, password string) (*models.User, error) {
+func (s *UserService) Register(name string, email string, password string) error {
 	user := &models.User{
 		Name:     name,
 		Email:    email,
@@ -18,10 +18,10 @@ func (s *UserService) Register(name, email, password string) (*models.User, erro
 
 	err := s.userRepository.Save(user)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return user, nil
+	return nil
 }
 
 func (s *UserService) Get(id string) (*models.User, error) {
