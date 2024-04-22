@@ -11,10 +11,6 @@ type UserRepository interface {
 	// more methods
 }
 
-type ScyllaRepository struct {
-	// Scylla init
-}
-
 func (r *ScyllaRepository) Save(User *models.User) error {
 	// Save logic
 
