@@ -16,7 +16,7 @@ func (s *UserService) Register(name string, email string, password string) error
 		Password: password,
 	}
 
-	err := s.userRepository.Save(user)
+	err := s.userRepository.SaveUser(user)
 	if err != nil {
 		return err
 	}
@@ -25,7 +25,7 @@ func (s *UserService) Register(name string, email string, password string) error
 }
 
 func (s *UserService) Get(id string) (*models.User, error) {
-	user, err := s.userRepository.Get(id)
+	user, err := s.userRepository.GetUser(id)
 	if err != nil {
 		return nil, err
 	}
@@ -35,7 +35,7 @@ func (s *UserService) Get(id string) (*models.User, error) {
 }
 
 func (s *UserService) List() (*[]models.User, error) {
-	users, err := s.userRepository.List()
+	users, err := s.userRepository.ListUsers()
 	if err != nil {
 		return nil, err
 	}

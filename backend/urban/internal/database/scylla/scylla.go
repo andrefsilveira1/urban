@@ -1,10 +1,21 @@
 package scylla
 
-import "github.com/gocql/gocql"
+import (
+	"log"
+	"os"
+
+	"github.com/gocql/gocql"
+	"github.com/joho/godotenv"
+)
 
 func Connect() {
-	cluster := gocql.NewCluster("127.0.0.1") // Replace
-	cluster.Keyspace = "urban-keyspace"      // This keyspace does not exist
+	if err := godotenv.Load(); err != nil {
+		log.Fatalf("Error loading .env file: %v", err)
+	}
+	ip := os.Getenv("CLUSTER_IP")
+	keyspace := os.Getenv("KEYSPACE_NAME")
+	cluster := gocql.NewCluster(ip)
+	cluster.Keyspace = keyspace
 	cluster.Consistency = gocql.Quorum
 
 	session, err := cluster.CreateSession()

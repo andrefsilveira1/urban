@@ -40,3 +40,14 @@ func GetUser(c *fiber.Ctx, userService *domain.UserService) error {
 	return c.JSON(user)
 
 }
+
+func ListUsers(c *fiber.Ctx, userService *domain.UserService) error {
+	users, err := userService.List()
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.JSON(users)
+}
