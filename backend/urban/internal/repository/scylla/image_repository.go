@@ -23,7 +23,7 @@ func NewScyllaImageRepository(session *gocql.Session) *ScyllaRepository {
 func (r *ScyllaRepository) Save(image *models.Image) error {
 	query := "INSERT INTO images (id, name, date, content) VALUES (?, ?, ?, ?)"
 	if err := r.session.Query(query, image.Id, image.Name, image.Date, image.Content).Exec(); err != nil {
-		return fmt.Errorf("Error: Saving image has failed: $v", err)
+		return fmt.Errorf("error: saving image has failed: %v", err)
 	}
 	return nil
 }
@@ -33,7 +33,7 @@ func (r *ScyllaRepository) Get(id string) (*models.Image, error) {
 
 	query := "SELECT id, name, date, content FROM images WHERE id = ? LIMIT 1"
 	if err := r.session.Query(query, id).Scan(&image.Id, &image.Name, &image.Date, &image.Content); err != nil {
-		return nil, fmt.Errorf("Error: Saving image has failed: $v", err)
+		return nil, fmt.Errorf("error: saving image has failed: %v", err)
 	}
 
 	return &image, nil
@@ -59,7 +59,7 @@ func (r *ScyllaRepository) List() ([]models.Image, error) {
 	}
 
 	if err := iter.Close(); err != nil {
-		return nil, fmt.Errorf("Error while listing images: %v", err)
+		return nil, fmt.Errorf("error while listing images: %v", err)
 	}
 
 	return images, nil
