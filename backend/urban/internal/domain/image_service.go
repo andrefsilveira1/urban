@@ -51,12 +51,3 @@ func (s *ImageService) Delete(id string) error {
 
 	return nil
 }
-
-func (s *ImageService) HashImage(image *models.Image) (*[]models.Image, error) {
-	images, err := s.imageRepository.HashImage(image)
-	if err != nil {
-		return nil, err
-	}
-
-	return images, nil
-}
