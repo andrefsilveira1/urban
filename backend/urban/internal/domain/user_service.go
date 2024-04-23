@@ -39,12 +39,3 @@ func (s *UserService) Get(id string) (*entity.User, error) {
 	return user, nil
 
 }
-
-func (s *UserService) List() (*[]entity.User, error) {
-	users, err := s.userRepository.ListUsers()
-	if err != nil {
-		return nil, err
-	}
-
-	return users, nil
-}
