@@ -9,6 +9,9 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/andrefsilveira1/urban/internal/database/scylla"
+	"github.com/andrefsilveira1/urban/internal/domain"
+	repository "github.com/andrefsilveira1/urban/internal/repository/scylla"
 	"github.com/andrefsilveira1/urban/internal/transport/rest"
 	"golang.org/x/sync/errgroup"
 )
@@ -34,9 +37,17 @@ func main() {
 
 	g, ctx := errgroup.WithContext(ctx)
 
+	session, err := scylla.Connect()
+	if err != nil {
+		log.Fatalf("Error connecting to Scylla: %v", err)
+	}
+	defer session.Close()
+	userRepository := repository.NewScyllaUserRepository(session)
+	userService := domain.NewUserService(userRepository)
+
 	g.Go(func() (err error) {
 		fmt.Println("Server started")
-		err = rest.Start(3000)
+		err = rest.Start(3000, userService)
 		// Start rest server here
 		if err != nil {
 			panic(err)
@@ -61,7 +72,7 @@ func main() {
 		// stop
 	}
 
-	err := g.Wait()
+	err = g.Wait()
 	if err != nil {
 		log.Printf("Server shutdown returned an error")
 		defer os.Exit(2)
