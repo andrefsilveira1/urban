@@ -3,17 +3,17 @@ package repository
 import (
 	"fmt"
 
-	"github.com/andrefsilveira1/urban/internal/domain/models"
+	"github.com/andrefsilveira1/urban/internal/domain/entity"
 )
 
 type UserRepository interface {
-	SaveUser(user *models.User) error
-	GetUser(id string) (*models.User, error)
-	ListUsers() (*[]models.User, error)
+	SaveUser(user *entity.User) error
+	GetUser(id string) (*entity.User, error)
+	ListUsers() (*[]entity.User, error)
 	// more methods
 }
 
-func (r *ScyllaRepository) SaveUser(User *models.User) error {
+func (r *ScyllaRepository) SaveUser(User *entity.User) error {
 	query := "INSERT INTO users (id, email, name, password) VALUES (?, ?, ?, ?)"
 	if err := r.session.Query(query, User.ID, User.Email, User.Name, User.Password).Exec(); err != nil {
 		return fmt.Errorf("error: saving user has failed: %v", err)
@@ -22,8 +22,8 @@ func (r *ScyllaRepository) SaveUser(User *models.User) error {
 	return nil
 }
 
-func (r *ScyllaRepository) GetUser(id string) (*models.User, error) {
-	var user models.User
+func (r *ScyllaRepository) GetUser(id string) (*entity.User, error) {
+	var user entity.User
 
 	query := "SELECT id, email, name FROM users WHERE id = ? LIMIT 1"
 	if err := r.session.Query(query, id).Scan(&user.ID, &user.Email, &user.Name); err != nil {

@@ -2,7 +2,7 @@ package endpoints
 
 import (
 	"github.com/andrefsilveira1/urban/internal/domain"
-	"github.com/andrefsilveira1/urban/internal/domain/models"
+	"github.com/andrefsilveira1/urban/internal/domain/entity"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -11,7 +11,7 @@ func Hello(c *fiber.Ctx) error {
 }
 
 func Save(c *fiber.Ctx, imageService *domain.ImageService) error {
-	var image models.Image
+	var image entity.Image
 	if err := c.BodyParser(&image); err != nil {
 		return c.Status(fiber.StatusBadRequest).SendString("Invalid request body")
 	}

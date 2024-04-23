@@ -2,7 +2,7 @@ package endpoints
 
 import (
 	"github.com/andrefsilveira1/urban/internal/domain"
-	"github.com/andrefsilveira1/urban/internal/domain/models"
+	"github.com/andrefsilveira1/urban/internal/domain/entity"
 	"github.com/gofiber/fiber"
 )
 
@@ -11,7 +11,7 @@ func HelloUser(c *fiber.Ctx, userService *domain.UserService) error {
 }
 
 func Register(c *fiber.Ctx, userService *domain.UserService) error {
-	var user models.User
+	var user entity.User
 	if err := c.BodyParser(&user); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Invalid request body",
