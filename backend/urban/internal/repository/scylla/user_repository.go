@@ -2,20 +2,31 @@ package repository
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/andrefsilveira1/urban/internal/domain/entity"
+	"github.com/gocql/gocql"
+	"github.com/gofrs/uuid"
 )
 
 type UserRepository interface {
 	SaveUser(user *entity.User) error
 	GetUser(id string) (*entity.User, error)
-	ListUsers() (*[]entity.User, error)
-	// more methods
+}
+
+func NewScyllaUserRepository(session *gocql.Session) *ScyllaRepository {
+	return &ScyllaRepository{
+		session: session,
+	}
 }
 
 func (r *ScyllaRepository) SaveUser(User *entity.User) error {
 	query := "INSERT INTO users (id, email, name, password) VALUES (?, ?, ?, ?)"
-	if err := r.session.Query(query, User.ID, User.Email, User.Name, User.Password).Exec(); err != nil {
+	id, err := uuid.NewV1()
+	if err != nil {
+		log.Fatalf("Error generating UUID: %v", err)
+	}
+	if err := r.session.Query(query, id, User.Email, User.Name, User.Password).Exec(); err != nil {
 		return fmt.Errorf("error: saving user has failed: %v", err)
 	}
 
