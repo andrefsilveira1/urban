@@ -8,7 +8,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func Connect() {
+func Connect() (*gocql.Session, error) {
 	if err := godotenv.Load(); err != nil {
 		log.Fatalf("Error loading .env file: %v", err)
 	}
@@ -23,5 +23,5 @@ func Connect() {
 		panic(err)
 	}
 
-	defer session.Close()
+	return session, nil
 }
