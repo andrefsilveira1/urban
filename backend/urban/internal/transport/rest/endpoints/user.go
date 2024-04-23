@@ -3,7 +3,7 @@ package endpoints
 import (
 	"github.com/andrefsilveira1/urban/internal/domain"
 	"github.com/andrefsilveira1/urban/internal/domain/entity"
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 )
 
 func HelloUser(c *fiber.Ctx, userService *domain.UserService) error {
@@ -39,15 +39,4 @@ func GetUser(c *fiber.Ctx, userService *domain.UserService) error {
 
 	return c.JSON(user)
 
-}
-
-func ListUsers(c *fiber.Ctx, userService *domain.UserService) error {
-	users, err := userService.List()
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": err.Error(),
-		})
-	}
-
-	return c.JSON(users)
 }
