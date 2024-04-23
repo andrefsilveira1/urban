@@ -2,8 +2,8 @@ package endpoints
 
 import (
 	"github.com/andrefsilveira1/urban/internal/domain"
-	"github.com/andrefsilveira1/urban/internal/domain/models"
-	"github.com/gofiber/fiber"
+	"github.com/andrefsilveira1/urban/internal/domain/entity"
+	"github.com/gofiber/fiber/v2"
 )
 
 func HelloUser(c *fiber.Ctx, userService *domain.UserService) error {
@@ -11,7 +11,7 @@ func HelloUser(c *fiber.Ctx, userService *domain.UserService) error {
 }
 
 func Register(c *fiber.Ctx, userService *domain.UserService) error {
-	var user models.User
+	var user entity.User
 	if err := c.BodyParser(&user); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Invalid request body",
@@ -39,15 +39,4 @@ func GetUser(c *fiber.Ctx, userService *domain.UserService) error {
 
 	return c.JSON(user)
 
-}
-
-func ListUsers(c *fiber.Ctx, userService *domain.UserService) error {
-	users, err := userService.List()
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": err.Error(),
-		})
-	}
-
-	return c.JSON(users)
 }

@@ -3,14 +3,14 @@ package repository
 import (
 	"fmt"
 
-	"github.com/andrefsilveira1/urban/internal/domain/models"
+	"github.com/andrefsilveira1/urban/internal/domain/entity"
 	"github.com/gocql/gocql"
 )
 
 type ImageRepository interface {
-	Save(image *models.Image) error
-	Get(id string) (*models.Image, error)
-	List() (*[]models.Image, error)
+	Save(image *entity.Image) error
+	Get(id string) (*entity.Image, error)
+	List() (*[]entity.Image, error)
 	Delete(id string) error
 }
 
@@ -20,7 +20,7 @@ func NewScyllaImageRepository(session *gocql.Session) *ScyllaRepository {
 	}
 }
 
-func (r *ScyllaRepository) Save(image *models.Image) error {
+func (r *ScyllaRepository) Save(image *entity.Image) error {
 	query := "INSERT INTO images (id, name, date, content) VALUES (?, ?, ?, ?)"
 	if err := r.session.Query(query, image.Id, image.Name, image.Date, image.Content).Exec(); err != nil {
 		return fmt.Errorf("error: saving image has failed: %v", err)
@@ -28,8 +28,8 @@ func (r *ScyllaRepository) Save(image *models.Image) error {
 	return nil
 }
 
-func (r *ScyllaRepository) Get(id string) (*models.Image, error) {
-	var image models.Image
+func (r *ScyllaRepository) Get(id string) (*entity.Image, error) {
+	var image entity.Image
 
 	query := "SELECT id, name, date, content FROM images WHERE id = ? LIMIT 1"
 	if err := r.session.Query(query, id).Scan(&image.Id, &image.Name, &image.Date, &image.Content); err != nil {
@@ -39,8 +39,8 @@ func (r *ScyllaRepository) Get(id string) (*models.Image, error) {
 	return &image, nil
 }
 
-func (r *ScyllaRepository) List() ([]models.Image, error) {
-	var images []models.Image
+func (r *ScyllaRepository) List() ([]entity.Image, error) {
+	var images []entity.Image
 	query := "SELECT id, name, date, content FROM images"
 	iter := r.session.Query(query).Iter()
 	defer iter.Close()
@@ -50,7 +50,7 @@ func (r *ScyllaRepository) List() ([]models.Image, error) {
 	var content []byte
 
 	for iter.Scan(&id, &name, &date, &content) {
-		images = append(images, models.Image{
+		images = append(images, entity.Image{
 			Id:      id,
 			Name:    name,
 			Date:    date.Time(),

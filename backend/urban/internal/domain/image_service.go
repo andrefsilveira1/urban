@@ -3,7 +3,7 @@ package domain
 import (
 	"time"
 
-	"github.com/andrefsilveira1/urban/internal/domain/models"
+	"github.com/andrefsilveira1/urban/internal/domain/entity"
 	repository "github.com/andrefsilveira1/urban/internal/repository/scylla"
 )
 
@@ -12,7 +12,7 @@ type ImageService struct {
 }
 
 func (s *ImageService) Register(name string, date time.Time, content []byte) error {
-	image := &models.Image{
+	image := &entity.Image{
 		Name:    name,
 		Date:    date,
 		Content: content,
@@ -25,7 +25,7 @@ func (s *ImageService) Register(name string, date time.Time, content []byte) err
 	return nil
 }
 
-func (s *ImageService) Get(id string) (*models.Image, error) {
+func (s *ImageService) Get(id string) (*entity.Image, error) {
 	image, err := s.imageRepository.Get(id)
 	if err != nil {
 		return nil, err
@@ -34,7 +34,7 @@ func (s *ImageService) Get(id string) (*models.Image, error) {
 	return image, nil
 }
 
-func (s *ImageService) List() (*[]models.Image, error) {
+func (s *ImageService) List() (*[]entity.Image, error) {
 	images, err := s.imageRepository.List()
 	if err != nil {
 		return nil, err

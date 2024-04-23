@@ -1,7 +1,7 @@
 package domain
 
 import (
-	"github.com/andrefsilveira1/urban/internal/domain/models"
+	"github.com/andrefsilveira1/urban/internal/domain/entity"
 	repository "github.com/andrefsilveira1/urban/internal/repository/scylla"
 )
 
@@ -9,8 +9,14 @@ type UserService struct {
 	userRepository repository.UserRepository
 }
 
+func NewUserService(userRepository repository.UserRepository) *UserService {
+	return &UserService{
+		userRepository: userRepository,
+	}
+}
+
 func (s *UserService) Register(name string, email string, password string) error {
-	user := &models.User{
+	user := &entity.User{
 		Name:     name,
 		Email:    email,
 		Password: password,
@@ -24,7 +30,7 @@ func (s *UserService) Register(name string, email string, password string) error
 	return nil
 }
 
-func (s *UserService) Get(id string) (*models.User, error) {
+func (s *UserService) Get(id string) (*entity.User, error) {
 	user, err := s.userRepository.GetUser(id)
 	if err != nil {
 		return nil, err
@@ -32,13 +38,4 @@ func (s *UserService) Get(id string) (*models.User, error) {
 
 	return user, nil
 
-}
-
-func (s *UserService) List() (*[]models.User, error) {
-	users, err := s.userRepository.ListUsers()
-	if err != nil {
-		return nil, err
-	}
-
-	return users, nil
 }
