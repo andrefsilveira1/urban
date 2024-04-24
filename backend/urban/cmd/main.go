@@ -8,7 +8,6 @@ import (
 	"syscall"
 
 	"github.com/andrefsilveira1/urban/internal/database/scylla"
-	"github.com/andrefsilveira1/urban/internal/domain"
 	"github.com/andrefsilveira1/urban/internal/transport/rest"
 )
 
@@ -25,8 +24,6 @@ func main() {
 	defer session.Close()
 
 	// Initialize repositories and services
-	userRepository := domain.NewScyllaUserRepository(session)
-	userService := domain.NewUserService(userRepository)
 	rest.Start(3000, userService)
 
 }
