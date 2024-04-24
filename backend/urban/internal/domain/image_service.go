@@ -1,7 +1,7 @@
 package domain
 
 import (
-	"time"
+	"errors"
 
 	"github.com/andrefsilveira1/urban/internal/domain/entity"
 )
@@ -10,43 +10,38 @@ type ImageService struct {
 	imageRepository ImageRepository
 }
 
-func (s *ImageService) Register(name string, date time.Time, content []byte) error {
-	image := &entity.Image{
-		Name:    name,
-		Date:    date,
-		Content: content,
+func NewImageService(repo ImageRepository) *ImageService {
+	return &ImageService{
+		imageRepository: repo,
 	}
-	err := s.imageRepository.Save(image)
-	if err != nil {
-		return err
-	}
+}
 
-	return nil
+func (s *ImageService) Register(image *entity.Image) error {
+
+	if image == nil {
+		return errors.New("image can't be null")
+	}
+	return s.imageRepository.Save(image)
 }
 
 func (s *ImageService) Get(id string) (*entity.Image, error) {
-	image, err := s.imageRepository.Get(id)
-	if err != nil {
-		return nil, err
+	if id == "" {
+		return nil, errors.New("id can't be null")
 	}
 
-	return image, nil
+	return s.imageRepository.Get(id)
+
 }
 
 func (s *ImageService) List() (*[]entity.Image, error) {
-	images, err := s.imageRepository.List()
-	if err != nil {
-		return nil, err
-	}
+	return s.imageRepository.List()
 
-	return images, nil
 }
 
 func (s *ImageService) Delete(id string) error {
-	err := s.imageRepository.Delete(id)
-	if err != nil {
-		return err
+	if id == "" {
+		return errors.New("invalid id")
 	}
+	return s.imageRepository.Delete(id)
 
-	return nil
 }
