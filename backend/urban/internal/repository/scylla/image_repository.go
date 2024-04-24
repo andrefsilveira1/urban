@@ -29,7 +29,7 @@ func NewImageRepository(db *gocql.Session) *ImageRepository {
 	}
 }
 
-func (r *ImageRepository) CreateImage(id gocql.UUID, name, date gocql.UUID, content []byte) error {
+func (r *ImageRepository) CreateImage(id gocql.UUID, name string, date gocql.UUID, content []byte) error {
 	return r.DB.Query(queries[createImage], id, name, date, content).Exec()
 }
 
