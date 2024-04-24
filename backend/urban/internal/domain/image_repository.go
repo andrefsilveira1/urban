@@ -7,6 +7,6 @@ import (
 type ImageRepository interface {
 	Save(image *entity.Image) error
 	Get(id string) (*entity.Image, error)
-	List() (*[]entity.Image, error)
+	List() ([]*entity.Image, error)
 	Delete(id string) error
 }

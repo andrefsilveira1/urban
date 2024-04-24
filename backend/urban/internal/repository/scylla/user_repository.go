@@ -1,4 +1,4 @@
-package scylla
+package repository
 
 import (
 	"fmt"
@@ -29,7 +29,7 @@ func NewUserRepository(db *gocql.Session) *UserRepository {
 	}
 }
 
-func (r *UserRepository) CreateUser(user entity.User) error {
+func (r *UserRepository) SaveUser(user *entity.User) error {
 	query := queriesUser[createUser]
 	if err := r.DB.Query(query, user.ID, user.Email, user.Name, user.Password).Exec(); err != nil {
 		return fmt.Errorf("error creating user: %w", err)
@@ -37,7 +37,7 @@ func (r *UserRepository) CreateUser(user entity.User) error {
 	return nil
 }
 
-func (r *UserRepository) DeleteUser(id gocql.UUID) error {
+func (r *UserRepository) DeleteUser(id string) error {
 	query := queriesUser[deleteUser]
 	if err := r.DB.Query(query, id).Exec(); err != nil {
 		return fmt.Errorf("error deleting user: %w", err)
@@ -45,7 +45,7 @@ func (r *UserRepository) DeleteUser(id gocql.UUID) error {
 	return nil
 }
 
-func (r *UserRepository) GetUser(id gocql.UUID) (*entity.User, error) {
+func (r *UserRepository) GetUser(id string) (*entity.User, error) {
 	query := queriesUser[getUser]
 	var user entity.User
 	if err := r.DB.Query(query, id).Scan(&user.Email, &user.Name); err != nil {

@@ -33,7 +33,7 @@ func (s *ImageService) Get(id string) (*entity.Image, error) {
 
 }
 
-func (s *ImageService) List() (*[]entity.Image, error) {
+func (s *ImageService) List() ([]*entity.Image, error) {
 	return s.imageRepository.List()
 
 }

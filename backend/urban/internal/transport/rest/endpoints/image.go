@@ -15,7 +15,7 @@ func Save(c *fiber.Ctx, imageService *domain.ImageService) error {
 	if err := c.BodyParser(&image); err != nil {
 		return c.Status(fiber.StatusBadRequest).SendString("Invalid request body")
 	}
-	err := imageService.Register(image.Name, image.Date, image.Content)
+	err := imageService.Register(&image)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),

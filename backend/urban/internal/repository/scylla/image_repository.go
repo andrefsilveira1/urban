@@ -1,4 +1,4 @@
-package scylla
+package repository
 
 import (
 	"fmt"
@@ -31,15 +31,15 @@ func NewImageRepository(db *gocql.Session) *ImageRepository {
 	}
 }
 
-func (r *ImageRepository) CreateImage(id gocql.UUID, name string, date gocql.UUID, content []byte) error {
+func (r *ImageRepository) Save(image *entity.Image) error {
 	query := queries[createImage]
-	if err := r.DB.Query(query, id, name, date, content).Exec(); err != nil {
+	if err := r.DB.Query(query, &image.Id, &image.Name, &image.Date, &image.Content).Exec(); err != nil {
 		return fmt.Errorf("error creating image: %w", err)
 	}
 	return nil
 }
 
-func (r *ImageRepository) DeleteImage(id gocql.UUID) error {
+func (r *ImageRepository) Delete(id string) error {
 	query := queries[deleteImage]
 	if err := r.DB.Query(query, id).Exec(); err != nil {
 		return fmt.Errorf("error deleting image: %w", err)
@@ -47,7 +47,7 @@ func (r *ImageRepository) DeleteImage(id gocql.UUID) error {
 	return nil
 }
 
-func (r *ImageRepository) GetImageById(id gocql.UUID) (*entity.Image, error) {
+func (r *ImageRepository) Get(id string) (*entity.Image, error) {
 	query := queries[getImage]
 	var img entity.Image
 	if err := r.DB.Query(query, id).Scan(&img.Id, &img.Name, &img.Date, &img.Content); err != nil {
@@ -59,14 +59,14 @@ func (r *ImageRepository) GetImageById(id gocql.UUID) (*entity.Image, error) {
 	return &img, nil
 }
 
-func (r *ImageRepository) ListImages() ([]entity.Image, error) {
+func (r *ImageRepository) List() ([]*entity.Image, error) {
 	query := queries[listImage]
-	var images []entity.Image
+	var images []*entity.Image
 	iter := r.DB.Query(query).Iter()
 	defer iter.Close()
 
 	for {
-		var img entity.Image
+		var img *entity.Image
 		if !iter.Scan(&img.Id, &img.Name, &img.Date, &img.Content) {
 			break
 		}

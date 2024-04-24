@@ -15,9 +15,9 @@ type Server struct {
 	app *fiber.App
 }
 
-func Start(port int, userService *domain.UserService) error {
+func Start(port int, userService *domain.UserService, imageService *domain.ImageService) error {
 	app := fiber.New()
-	routes.Setup(app, userService)
+	routes.Setup(app, userService, imageService)
 
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Hello World")
