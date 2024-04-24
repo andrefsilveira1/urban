@@ -1,0 +1,13 @@
+package scylla
+
+import "github.com/gocql/gocql"
+
+type UserRepository struct {
+	DB *gocql.Session
+}
+
+func NewUserRepository(db *gocql.Session) *UserRepository {
+	return &UserRepository{
+		DB: db,
+	}
+}
