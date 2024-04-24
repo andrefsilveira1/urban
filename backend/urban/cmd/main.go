@@ -26,8 +26,11 @@ func main() {
 	defer session.Close()
 
 	// Initialize repositories and services
-	userRepository := repository.NewScyllaUserRepository(session)
+	userRepository := repository.NewUserRepository(session)
+	imageRepository := repository.NewImageRepository(session)
+
 	userService := domain.NewUserService(userRepository)
-	rest.Start(3000, userService)
+	imageService := domain.NewImageService(imageRepository)
+	rest.Start(3000, userService, imageService)
 
 }

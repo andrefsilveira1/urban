@@ -1,41 +1,32 @@
 package domain
 
 import (
+	"errors"
+
 	"github.com/andrefsilveira1/urban/internal/domain/entity"
-	repository "github.com/andrefsilveira1/urban/internal/repository/scylla"
 )
 
 type UserService struct {
-	userRepository repository.UserRepository
+	userRepository UserRepository
 }
 
-func NewUserService(userRepository repository.UserRepository) *UserService {
+func NewUserService(userRepository UserRepository) *UserService {
 	return &UserService{
 		userRepository: userRepository,
 	}
 }
 
-func (s *UserService) Register(name string, email string, password string) error {
-	user := &entity.User{
-		Name:     name,
-		Email:    email,
-		Password: password,
+func (s *UserService) Register(user *entity.User) error {
+	if user == nil {
+		return errors.New("user can't be null")
 	}
-
-	err := s.userRepository.SaveUser(user)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return s.userRepository.SaveUser(user)
 }
 
 func (s *UserService) Get(id string) (*entity.User, error) {
-	user, err := s.userRepository.GetUser(id)
-	if err != nil {
-		return nil, err
+	if id == "" {
+		return nil, errors.New("id is null")
 	}
-
-	return user, nil
+	return s.userRepository.GetUser(id)
 
 }

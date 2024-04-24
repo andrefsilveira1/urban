@@ -7,69 +7,75 @@ import (
 	"github.com/gocql/gocql"
 )
 
-type ImageRepository interface {
-	Save(image *entity.Image) error
-	Get(id string) (*entity.Image, error)
-	List() (*[]entity.Image, error)
-	Delete(id string) error
+const (
+	createImage = "create image"
+	deleteImage = "delete image by id"
+	getImage    = "get image by id"
+	listImage   = "list images"
+)
+
+var queries = map[string]string{
+	createImage: `INSERT INTO images (id, name, date, content) VALUES (?, ?, ?, ?)`,
+	deleteImage: `DELETE FROM images WHERE id = ?`,
+	getImage:    `SELECT id, name, date, content FROM images WHERE id = ? LIMIT 1`,
+	listImage:   `SELECT id, name, date, content FROM images`,
 }
 
-func NewScyllaImageRepository(session *gocql.Session) *ScyllaRepository {
-	return &ScyllaRepository{
-		session: session,
+type ImageRepository struct {
+	DB *gocql.Session
+}
+
+func NewImageRepository(db *gocql.Session) *ImageRepository {
+	return &ImageRepository{
+		DB: db,
 	}
 }
 
-func (r *ScyllaRepository) Save(image *entity.Image) error {
-	query := "INSERT INTO images (id, name, date, content) VALUES (?, ?, ?, ?)"
-	if err := r.session.Query(query, image.Id, image.Name, image.Date, image.Content).Exec(); err != nil {
-		return fmt.Errorf("error: saving image has failed: %v", err)
+func (r *ImageRepository) Save(image *entity.Image) error {
+	query := queries[createImage]
+	if err := r.DB.Query(query, &image.Id, &image.Name, &image.Date, &image.Content).Exec(); err != nil {
+		return fmt.Errorf("error creating image: %w", err)
 	}
 	return nil
 }
 
-func (r *ScyllaRepository) Get(id string) (*entity.Image, error) {
-	var image entity.Image
-
-	query := "SELECT id, name, date, content FROM images WHERE id = ? LIMIT 1"
-	if err := r.session.Query(query, id).Scan(&image.Id, &image.Name, &image.Date, &image.Content); err != nil {
-		return nil, fmt.Errorf("error: saving image has failed: %v", err)
+func (r *ImageRepository) Delete(id string) error {
+	query := queries[deleteImage]
+	if err := r.DB.Query(query, id).Exec(); err != nil {
+		return fmt.Errorf("error deleting image: %w", err)
 	}
-
-	return &image, nil
+	return nil
 }
 
-func (r *ScyllaRepository) List() ([]entity.Image, error) {
-	var images []entity.Image
-	query := "SELECT id, name, date, content FROM images"
-	iter := r.session.Query(query).Iter()
+func (r *ImageRepository) Get(id string) (*entity.Image, error) {
+	query := queries[getImage]
+	var img entity.Image
+	if err := r.DB.Query(query, id).Scan(&img.Id, &img.Name, &img.Date, &img.Content); err != nil {
+		if err == gocql.ErrNotFound {
+			return nil, fmt.Errorf("image not found with ID %s", id)
+		}
+		return nil, fmt.Errorf("error getting image: %w", err)
+	}
+	return &img, nil
+}
+
+func (r *ImageRepository) List() ([]*entity.Image, error) {
+	query := queries[listImage]
+	var images []*entity.Image
+	iter := r.DB.Query(query).Iter()
 	defer iter.Close()
 
-	var id, name string
-	var date gocql.UUID
-	var content []byte
-
-	for iter.Scan(&id, &name, &date, &content) {
-		images = append(images, entity.Image{
-			Id:      id,
-			Name:    name,
-			Date:    date.Time(),
-			Content: content,
-		})
+	for {
+		var img *entity.Image
+		if !iter.Scan(&img.Id, &img.Name, &img.Date, &img.Content) {
+			break
+		}
+		images = append(images, img)
 	}
 
 	if err := iter.Close(); err != nil {
-		return nil, fmt.Errorf("error while listing images: %v", err)
+		return nil, fmt.Errorf("error listing images: %w", err)
 	}
 
 	return images, nil
-
-}
-
-func (r *ScyllaRepository) Delete(id string) error {
-	query := "DELETE FROM images WHERE id = ?"
-	if err := r.session.Query(query, id).Exec(); err != nil {
-		return fmt.Errorf("error deleting image: %v", err)
-	}
-	return nil
 }

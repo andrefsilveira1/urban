@@ -18,7 +18,7 @@ func Register(c *fiber.Ctx, userService *domain.UserService) error {
 		})
 	}
 
-	err := userService.Register(user.Name, user.Email, user.Password)
+	err := userService.Register(&user)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Invalid request body",

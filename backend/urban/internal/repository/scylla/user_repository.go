@@ -2,45 +2,58 @@ package repository
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/andrefsilveira1/urban/internal/domain/entity"
 	"github.com/gocql/gocql"
-	"github.com/gofrs/uuid"
 )
 
-type UserRepository interface {
-	SaveUser(user *entity.User) error
-	GetUser(id string) (*entity.User, error)
+const (
+	createUser = "createUser"
+	deleteUser = "deleteUser"
+	getUser    = "getUser"
+)
+
+var queriesUser = map[string]string{
+	createUser: `INSERT INTO users (id, email, name, password) VALUES (?, ?, ?, ?)`,
+	deleteUser: `DELETE FROM users WHERE id = ?`,
+	getUser:    `SELECT email, name FROM users WHERE id = ? LIMIT 1`,
 }
 
-func NewScyllaUserRepository(session *gocql.Session) *ScyllaRepository {
-	return &ScyllaRepository{
-		session: session,
+type UserRepository struct {
+	DB *gocql.Session
+}
+
+func NewUserRepository(db *gocql.Session) *UserRepository {
+	return &UserRepository{
+		DB: db,
 	}
 }
 
-func (r *ScyllaRepository) SaveUser(User *entity.User) error {
-	query := "INSERT INTO users (id, email, name, password) VALUES (?, ?, ?, ?)"
-	id, err := uuid.NewV1()
-	if err != nil {
-		log.Fatalf("Error generating UUID: %v", err)
+func (r *UserRepository) SaveUser(user *entity.User) error {
+	query := queriesUser[createUser]
+	if err := r.DB.Query(query, user.ID, user.Email, user.Name, user.Password).Exec(); err != nil {
+		return fmt.Errorf("error creating user: %w", err)
 	}
-	if err := r.session.Query(query, id, User.Email, User.Name, User.Password).Exec(); err != nil {
-		return fmt.Errorf("error: saving user has failed: %v", err)
-	}
-
 	return nil
 }
 
-func (r *ScyllaRepository) GetUser(id string) (*entity.User, error) {
-	var user entity.User
-
-	query := "SELECT id, email, name FROM users WHERE id = ? LIMIT 1"
-	if err := r.session.Query(query, id).Scan(&user.ID, &user.Email, &user.Name); err != nil {
-		return nil, fmt.Errorf("error: saving image has failed: %v", err)
+func (r *UserRepository) DeleteUser(id string) error {
+	query := queriesUser[deleteUser]
+	if err := r.DB.Query(query, id).Exec(); err != nil {
+		return fmt.Errorf("error deleting user: %w", err)
 	}
-	// Create authorization later
-	return &user, nil
+	return nil
+}
 
+func (r *UserRepository) GetUser(id string) (*entity.User, error) {
+	query := queriesUser[getUser]
+	var user entity.User
+	if err := r.DB.Query(query, id).Scan(&user.Email, &user.Name); err != nil {
+		if err == gocql.ErrNotFound {
+			return nil, fmt.Errorf("user not found with ID %s", id)
+		}
+		return nil, fmt.Errorf("error getting user: %w", err)
+	}
+
+	return &user, nil
 }
