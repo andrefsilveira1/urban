@@ -1,6 +1,8 @@
 package scylla
 
 import (
+	"fmt"
+
 	"github.com/andrefsilveira1/urban/internal/domain/entity"
 	"github.com/gocql/gocql"
 )
@@ -30,25 +32,37 @@ func NewImageRepository(db *gocql.Session) *ImageRepository {
 }
 
 func (r *ImageRepository) CreateImage(id gocql.UUID, name string, date gocql.UUID, content []byte) error {
-	return r.DB.Query(queries[createImage], id, name, date, content).Exec()
+	query := queries[createImage]
+	if err := r.DB.Query(query, id, name, date, content).Exec(); err != nil {
+		return fmt.Errorf("error creating image: %w", err)
+	}
+	return nil
 }
 
 func (r *ImageRepository) DeleteImage(id gocql.UUID) error {
-	return r.DB.Query(queries[deleteImage], id).Exec()
+	query := queries[deleteImage]
+	if err := r.DB.Query(query, id).Exec(); err != nil {
+		return fmt.Errorf("error deleting image: %w", err)
+	}
+	return nil
 }
 
 func (r *ImageRepository) GetImageById(id gocql.UUID) (*entity.Image, error) {
+	query := queries[getImage]
 	var img entity.Image
-	if err := r.DB.Query(queries[getImage], id).Scan(&img.Id, &img.Name, &img.Date, &img.Content); err != nil {
-		return nil, err
+	if err := r.DB.Query(query, id).Scan(&img.Id, &img.Name, &img.Date, &img.Content); err != nil {
+		if err == gocql.ErrNotFound {
+			return nil, fmt.Errorf("image not found with ID %s", id)
+		}
+		return nil, fmt.Errorf("error getting image: %w", err)
 	}
-
 	return &img, nil
 }
 
 func (r *ImageRepository) ListImages() ([]entity.Image, error) {
-	var imgs []entity.Image
-	iter := r.DB.Query(queries[listImage]).Iter()
+	query := queries[listImage]
+	var images []entity.Image
+	iter := r.DB.Query(query).Iter()
 	defer iter.Close()
 
 	for {
@@ -56,9 +70,12 @@ func (r *ImageRepository) ListImages() ([]entity.Image, error) {
 		if !iter.Scan(&img.Id, &img.Name, &img.Date, &img.Content) {
 			break
 		}
-		imgs = append(imgs, img)
+		images = append(images, img)
 	}
 
-	return imgs, nil
+	if err := iter.Close(); err != nil {
+		return nil, fmt.Errorf("error listing images: %w", err)
+	}
 
+	return images, nil
 }
