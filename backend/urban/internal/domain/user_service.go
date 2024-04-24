@@ -2,14 +2,13 @@ package domain
 
 import (
 	"github.com/andrefsilveira1/urban/internal/domain/entity"
-	repository "github.com/andrefsilveira1/urban/internal/repository/scylla"
 )
 
 type UserService struct {
-	userRepository repository.UserRepository
+	userRepository UserRepository
 }
 
-func NewUserService(userRepository repository.UserRepository) *UserService {
+func NewUserService(userRepository UserRepository) *UserService {
 	return &UserService{
 		userRepository: userRepository,
 	}

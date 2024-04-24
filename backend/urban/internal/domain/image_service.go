@@ -4,11 +4,10 @@ import (
 	"time"
 
 	"github.com/andrefsilveira1/urban/internal/domain/entity"
-	repository "github.com/andrefsilveira1/urban/internal/repository/scylla"
 )
 
 type ImageService struct {
-	imageRepository repository.ImageRepository
+	imageRepository ImageRepository
 }
 
 func (s *ImageService) Register(name string, date time.Time, content []byte) error {
