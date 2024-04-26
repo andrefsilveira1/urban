@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -18,7 +19,12 @@ import (
 func main() {
 	fmt.Println("Starting server...")
 
-	cfg := &config.ServerHTTP{Host: "localhost", Port: 8080}
+	var configpath string
+	flag.StringVar(&configpath, "config", "", "Path to config file")
+	flag.Parse()
+
+	cfg := loadConfig(configpath)
+	// cfg := &config.ServerHTTP{Host: "localhost", Port: 8080}
 
 	// Gracefully shutdown
 	interrupt := make(chan os.Signal, 1)
@@ -33,7 +39,7 @@ func main() {
 	var rest *rest.Server
 	g.Go(func() (err error) {
 		router := mux.NewRouter().StrictSlash(true)
-		rest, err = rest.NewServer(cfg, router)
+		rest, err = rest.NewServer(cfg.Server.HTTP, router)
 
 		return rest.Start()
 	})
@@ -62,4 +68,21 @@ func main() {
 		defer os.Exit(2)
 	}
 	log.Println("service shutdown")
+}
+
+func loadConfig(configPath string) *config.Config {
+	if configPath == "" {
+		configPath = os.Getenv("APP_CONFIG_PATH")
+		if configPath == "" {
+			configPath = "./config.yaml"
+		}
+	}
+
+	cfg, err := config.NewConfig(configPath)
+	if err != nil {
+		log.Printf("configuration error :%v", err)
+		os.Exit(-1)
+	}
+
+	return cfg
 }
