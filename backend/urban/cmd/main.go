@@ -11,7 +11,9 @@ import (
 	"time"
 
 	"github.com/andrefsilveira1/urban/internal/config"
+	"github.com/andrefsilveira1/urban/internal/database/scylla"
 	"github.com/andrefsilveira1/urban/internal/transport/rest"
+	"github.com/gocql/gocql"
 	"github.com/gorilla/mux"
 	"golang.org/x/sync/errgroup"
 )
@@ -24,6 +26,7 @@ func main() {
 	flag.Parse()
 
 	cfg := loadConfig(configpath)
+	db := loadDatabase(cfg.Database)
 	// cfg := &config.ServerHTTP{Host: "localhost", Port: 8080}
 
 	// Gracefully shutdown
@@ -85,4 +88,14 @@ func loadConfig(configPath string) *config.Config {
 	}
 
 	return cfg
+}
+
+func loadDatabase(cfg *config.Database) *gocql.Session {
+	db, err := scylla.Connect(cfg)
+	if err != nil {
+		log.Printf("load database error: %v", err)
+		os.Exit(-1)
+	}
+
+	return db
 }

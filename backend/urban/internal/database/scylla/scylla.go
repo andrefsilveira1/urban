@@ -2,25 +2,22 @@ package scylla
 
 import (
 	"log"
-	"os"
 
+	"github.com/andrefsilveira1/urban/internal/config"
 	"github.com/gocql/gocql"
-	"github.com/joho/godotenv"
 )
 
-func Connect() (*gocql.Session, error) {
-	if err := godotenv.Load(); err != nil {
-		log.Fatalf("Error loading .env file: %v", err)
+func Connect(cfg *config.Database) (*gocql.Session, error) {
+	cluster := gocql.NewCluster(cfg.Cluster...)
+	cluster.Keyspace = cfg.Keyspace
+	cluster.Authenticator = gocql.PasswordAuthenticator{
+		Username: cfg.Username,
+		Password: cfg.Password,
 	}
-	ip := os.Getenv("CLUSTER_IP")
-	keyspace := os.Getenv("KEYSPACE_NAME")
-	cluster := gocql.NewCluster(ip)
-	cluster.Keyspace = keyspace
-	cluster.Consistency = gocql.Quorum
 
 	session, err := cluster.CreateSession()
 	if err != nil {
-		panic(err)
+		log.Printf("scylla connection error: %v", err)
 	}
 
 	return session, nil
