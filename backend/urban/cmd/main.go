@@ -12,6 +12,8 @@ import (
 
 	"github.com/andrefsilveira1/urban/internal/config"
 	"github.com/andrefsilveira1/urban/internal/database/scylla"
+	"github.com/andrefsilveira1/urban/internal/domain"
+	repository "github.com/andrefsilveira1/urban/internal/repository/scylla"
 	"github.com/andrefsilveira1/urban/internal/transport/rest"
 	"github.com/gocql/gocql"
 	"github.com/gorilla/mux"
@@ -27,6 +29,13 @@ func main() {
 
 	cfg := loadConfig(configpath)
 	db := loadDatabase(cfg.Database)
+
+	userRepository := repository.NewUserRepository(db)
+	imageRepository := repository.NewImageRepository(db)
+
+	userService := domain.NewUserService(userRepository)
+	imageService := domain.NewImageService(imageRepository)
+
 	// cfg := &config.ServerHTTP{Host: "localhost", Port: 8080}
 
 	// Gracefully shutdown
@@ -39,12 +48,19 @@ func main() {
 	defer cancel()
 
 	g, ctx := errgroup.WithContext(ctx)
-	var rest *rest.Server
+
+	var restServer *rest.Server
 	g.Go(func() (err error) {
 		router := mux.NewRouter().StrictSlash(true)
-		rest, err = rest.NewServer(cfg.Server.HTTP, router)
 
-		return rest.Start()
+		rest.NewImageHandler(imageService).Register(router)
+		rest.NewUserHandler(userService).Register(router)
+		restServer, err = restServer.NewServer(cfg.Server.HTTP, router)
+		if err != nil {
+			log.Printf("error until new server method: %v", err)
+			os.Exit(-1)
+		}
+		return restServer.Start()
 	})
 
 	log.Println("service started")
@@ -61,8 +77,8 @@ func main() {
 	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer shutdownCancel()
 
-	if rest != nil {
-		rest.Stop(shutdownCtx)
+	if restServer != nil {
+		restServer.Stop(shutdownCtx)
 	}
 
 	err := g.Wait()

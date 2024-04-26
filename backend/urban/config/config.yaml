@@ -1,0 +1,10 @@
+database:
+  cluster: postgres
+  keyspace: localhost
+  username: scylla
+  password: scylla
+
+server:
+  http:
+    host: localhost
+    port: 8080
