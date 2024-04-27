@@ -32,7 +32,9 @@ func main() {
 
 	userRepository := repository.NewUserRepository(db)
 	imageRepository := repository.NewImageRepository(db)
+	testRepository := repository.NewTestRepository(db)
 
+	testService := domain.NewTestService(testRepository)
 	userService := domain.NewUserService(userRepository)
 	imageService := domain.NewImageService(imageRepository)
 
@@ -52,6 +54,7 @@ func main() {
 
 		rest.NewImageHandler(imageService).Register(router)
 		rest.NewUserHandler(userService).Register(router)
+		rest.NewTestHandler(testService).Register(router)
 		restServer, err = restServer.NewServer(cfg.Server.HTTP, router)
 		if err != nil {
 			log.Printf("error until new server method: %v", err)
