@@ -1,8 +1,6 @@
 database:
-  cluster: postgres
-  keyspace: localhost
-  username: scylla
-  password: scylla
+  cluster: Test Cluster
+  keyspace: my_keyspace
 
 server:
   http:

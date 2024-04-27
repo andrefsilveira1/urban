@@ -11,8 +11,8 @@ func Connect(cfg *config.Database) (*gocql.Session, error) {
 	cluster := gocql.NewCluster(cfg.Cluster...)
 	cluster.Keyspace = cfg.Keyspace
 	cluster.Authenticator = gocql.PasswordAuthenticator{
-		Username: cfg.Username,
-		Password: cfg.Password,
+		// Username: cfg.Username,
+		// Password: cfg.Password,
 	}
 
 	session, err := cluster.CreateSession()
