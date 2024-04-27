@@ -52,6 +52,7 @@ func main() {
 
 		rest.NewImageHandler(imageService).Register(router)
 		rest.NewUserHandler(userService).Register(router)
+		rest.NewUserHandler(userService).Register(router)
 		restServer, err = restServer.NewServer(cfg.Server.HTTP, router)
 		if err != nil {
 			log.Printf("error until new server method: %v", err)
