@@ -1,8 +1,0 @@
-database:
-  cluster: Test Cluster
-  keyspace: my_keyspace
-
-server:
-  http:
-    host: localhost
-    port: 8080
