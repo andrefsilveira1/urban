@@ -9,17 +9,17 @@ import (
 )
 
 type TestHandler struct {
-	imageService *domain.ImageService
+	testService *domain.TestService
 }
 
-func NewTestHandler(imageService *domain.ImageService) *TestHandler {
+func NewTestHandler(testService *domain.TestService) *TestHandler {
 	return &TestHandler{
-		imageService: imageService,
+		testService: testService,
 	}
 }
 
 func (h *TestHandler) Register(router *mux.Router) {
-	testEndpoint := endpoints.MakeTestEndpoint(h.imageService)
+	testEndpoint := endpoints.MakeTestEndpoint(h.testService)
 
 	router.HandleFunc("/test", testEndpoint).Methods(http.MethodGet)
 }
