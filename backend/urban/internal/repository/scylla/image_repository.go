@@ -33,7 +33,7 @@ func NewImageRepository(db *gocql.Session) *ImageRepository {
 
 func (r *ImageRepository) Save(image *entity.Image) error {
 	query := queries[createImage]
-	if err := r.DB.Query(query, &image.Id, &image.Name, &image.Date, &image.Content).Exec(); err != nil {
+	if err := r.DB.Query(query, image.Id, image.Name, image.Date, image.Content).Exec(); err != nil {
 		return fmt.Errorf("error creating image: %w", err)
 	}
 	return nil

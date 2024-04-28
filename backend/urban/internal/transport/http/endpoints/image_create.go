@@ -2,6 +2,7 @@ package endpoints
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"time"
@@ -12,8 +13,6 @@ import (
 
 func MakeCreateImageEndpoint(imageService *domain.ImageService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var body entity.Image
-
 		err := r.ParseMultipartForm(200 << 20)
 		if err != nil {
 			http.Error(w, "Failed to parse multi form data", http.StatusInternalServerError)
@@ -49,12 +48,13 @@ func MakeCreateImageEndpoint(imageService *domain.ImageService) http.HandlerFunc
 		}
 
 		err = imageService.Register(image)
+		fmt.Println("ERROR :", err)
 		if err != nil {
 			http.Error(w, "Failed to create image", http.StatusInternalServerError)
 			return
 		}
 
-		res := map[string]string{"image_id": body.Id}
+		res := map[string]string{"image_id": id}
 		w.Header().Set("Content-Type", "application/json")
 		if err := json.NewEncoder(w).Encode(res); err != nil {
 			http.Error(w, "Failed to enconde response", http.StatusInternalServerError)
