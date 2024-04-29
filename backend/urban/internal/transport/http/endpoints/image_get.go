@@ -1,11 +1,9 @@
 package endpoints
 
 import (
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
 
 	"github.com/andrefsilveira1/urban/internal/domain"
 	"github.com/gorilla/mux"
@@ -37,25 +35,24 @@ func MakeGetImageEndpoint(imageService *domain.ImageService) http.HandlerFunc {
 	}
 }
 
+// func testImage(content []byte) {
+// 		encode := base64.StdEncoding.EncodeToString(content)
+// 		decoded, err := base64.StdEncoding.DecodeString(encode)
+// 		if err != nil {
+// 			fmt.Println("Error to decode image")
+// 			return
+// 		}
 
-func testImage(content []byte) {
-		encode := base64.StdEncoding.EncodeToString(content)
-		decoded, err := base64.StdEncoding.DecodeString(encode)
-		if err != nil {
-			fmt.Println("Error to decode image")
-			return
-		}
+// 		filepath := "decoded_image.png"
+// 		err = os.WriteFile(filepath, decoded, 0644)
+// 		if err != nil {
+// 			fmt.Println("Error writing decoded content to file:", err)
+// 			return
+// 		}
+// 		fmt.Printf("Decoded image saved as: %s\n", filepath)
 
-		filepath := "decoded_image.png"
-		err = os.WriteFile(filepath, decoded, 0644)
-		if err != nil {
-			fmt.Println("Error writing decoded content to file:", err)
-			return
-		}
-		fmt.Printf("Decoded image saved as: %s\n", filepath)
-
-		if err != nil {
-			fmt.Println("Error to read image")
-			return
-		}
-}
+// 		if err != nil {
+// 			fmt.Println("Error to read image")
+// 			return
+// 		}
+// }
