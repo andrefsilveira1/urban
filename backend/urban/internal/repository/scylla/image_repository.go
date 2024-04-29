@@ -72,7 +72,7 @@ func (r *ImageRepository) List() ([]*entity.Image, error) {
 	defer iter.Close()
 
 	for {
-		var img *entity.Image
+		img := &entity.Image{}
 		if !iter.Scan(&img.Id, &img.Name, &img.Date, &img.Content) {
 			break
 		}
