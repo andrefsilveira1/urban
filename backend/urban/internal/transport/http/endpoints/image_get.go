@@ -15,31 +15,13 @@ func MakeGetImageEndpoint(imageService *domain.ImageService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		id := vars["id"]
-		fmt.Println("ID:", id)
+		fmt.Println("Id received:", id)
 
 		image, err := imageService.Get(id)
+		// testImage(image.Content)
 
 		if err != nil {
 			http.Error(w, "Failed to decode image content", http.StatusInternalServerError)
-			return
-		}
-
-		decoded, err := base64.StdEncoding.DecodeString(string(image.Content))
-		if err != nil {
-			http.Error(w, "Failed to decode image string", http.StatusInternalServerError)
-			return
-		}
-
-		filepath := "decoded_image.png"
-		err = os.WriteFile(filepath, decoded, 0644)
-		if err != nil {
-			fmt.Println("Error writing decoded content to file:", err)
-			return
-		}
-		fmt.Printf("Decoded image saved as: %s\n", filepath)
-
-		if err != nil {
-			http.Error(w, "Failed to retrieve image", http.StatusInternalServerError)
 			return
 		}
 
@@ -53,4 +35,27 @@ func MakeGetImageEndpoint(imageService *domain.ImageService) http.HandlerFunc {
 		w.WriteHeader(http.StatusOK)
 		w.Write(response)
 	}
+}
+
+
+func testImage(content []byte) {
+		encode := base64.StdEncoding.EncodeToString(content)
+		decoded, err := base64.StdEncoding.DecodeString(encode)
+		if err != nil {
+			fmt.Println("Error to decode image")
+			return
+		}
+
+		filepath := "decoded_image.png"
+		err = os.WriteFile(filepath, decoded, 0644)
+		if err != nil {
+			fmt.Println("Error writing decoded content to file:", err)
+			return
+		}
+		fmt.Printf("Decoded image saved as: %s\n", filepath)
+
+		if err != nil {
+			fmt.Println("Error to read image")
+			return
+		}
 }

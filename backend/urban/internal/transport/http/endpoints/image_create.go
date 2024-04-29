@@ -6,7 +6,7 @@ import (
 	"io"
 	"net/http"
 	"time"
-
+	"github.com/gocql/gocql"
 	"github.com/andrefsilveira1/urban/internal/domain"
 	"github.com/andrefsilveira1/urban/internal/domain/entity"
 )
@@ -18,7 +18,6 @@ func MakeCreateImageEndpoint(imageService *domain.ImageService) http.HandlerFunc
 			http.Error(w, "Failed to parse multi form data", http.StatusInternalServerError)
 		}
 
-		id := r.FormValue("id")
 		name := r.FormValue("name")
 		dateString := r.FormValue("date")
 		date, err := time.Parse("2006-01-02", dateString)
@@ -41,20 +40,20 @@ func MakeCreateImageEndpoint(imageService *domain.ImageService) http.HandlerFunc
 		}
 
 		image := &entity.Image{
-			Id:      id,
+			Id:      gocql.TimeUUID(),
 			Name:    name,
 			Date:    date,
 			Content: imageContent,
 		}
 
 		err = imageService.Register(image)
-		fmt.Println("ERROR :", err)
 		if err != nil {
+			fmt.Println("ERROR :", err)
 			http.Error(w, "Failed to create image", http.StatusInternalServerError)
 			return
 		}
 
-		res := map[string]string{"image_id": id}
+		res := map[string]gocql.UUID{"image_id": image.Id}
 		w.Header().Set("Content-Type", "application/json")
 		if err := json.NewEncoder(w).Encode(res); err != nil {
 			http.Error(w, "Failed to enconde response", http.StatusInternalServerError)

@@ -1,8 +1,7 @@
 CREATE TABLE images (
-    image_id UUID PRIMARY KEY,
+    id UUID PRIMARY KEY,
     name text,
-    format text,
-    size int,
+    date timestamp,
     content blob
 );
 
