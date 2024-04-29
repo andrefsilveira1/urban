@@ -30,3 +30,11 @@ func (s *UserService) Get(id string) (*entity.User, error) {
 	return s.userRepository.GetUser(id)
 
 }
+
+func (s *UserService) Delete(id string) error {
+	if id == "" {
+		return errors.New("id is null")
+	}
+
+	return s.userRepository.DeleteUser(id)
+}

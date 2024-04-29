@@ -31,7 +31,7 @@ func NewUserRepository(db *gocql.Session) *UserRepository {
 
 func (r *UserRepository) SaveUser(user *entity.User) error {
 	query := queriesUser[createUser]
-	if err := r.DB.Query(query, user.ID, user.Email, user.Name, user.Password).Exec(); err != nil {
+	if err := r.DB.Query(query, user.Id, user.Email, user.Name, user.Password).Exec(); err != nil {
 		return fmt.Errorf("error creating user: %w", err)
 	}
 	return nil
