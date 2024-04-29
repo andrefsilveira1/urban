@@ -23,7 +23,7 @@ func (h *UserHandler) Register(router *mux.Router) {
 	getUserEndpoint := endpoints.MakeGetUserEndpoint(h.userService)
 	deleteUserEndpoint := endpoints.MakeDeleteUserEndpoint(h.userService)
 
-	router.HandleFunc("/user", createUserEndpoint).Methods(http.MethodPost)
-	router.HandleFunc("/images/{id}", getUserEndpoint).Methods(http.MethodGet)
-	router.HandleFunc("/images/{id}", deleteUserEndpoint).Methods(http.MethodDelete)
+	router.HandleFunc("/users", createUserEndpoint).Methods(http.MethodPost)
+	router.HandleFunc("/users/{id}", getUserEndpoint).Methods(http.MethodGet)
+	router.HandleFunc("/users/{id}", deleteUserEndpoint).Methods(http.MethodDelete)
 }

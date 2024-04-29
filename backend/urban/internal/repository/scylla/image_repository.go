@@ -33,7 +33,7 @@ func NewImageRepository(db *gocql.Session) *ImageRepository {
 
 func (r *ImageRepository) Save(image *entity.Image) error {
 	query := queries[createImage]
-	if err := r.DB.Query(query, &image.Id, &image.Name, &image.Date, &image.Content).Exec(); err != nil {
+	if err := r.DB.Query(query, image.Id, image.Name, image.Date, image.Content).Exec(); err != nil {
 		return fmt.Errorf("error creating image: %w", err)
 	}
 	return nil
@@ -50,7 +50,13 @@ func (r *ImageRepository) Delete(id string) error {
 func (r *ImageRepository) Get(id string) (*entity.Image, error) {
 	query := queries[getImage]
 	var img entity.Image
-	if err := r.DB.Query(query, id).Scan(&img.Id, &img.Name, &img.Date, &img.Content); err != nil {
+
+	uuid, err := gocql.ParseUUID(id)
+	if err != nil {
+		fmt.Printf("Error parsing UUID string: %v\n", err)
+	}
+
+	if err := r.DB.Query(query, uuid).Scan(&img.Id, &img.Name, &img.Date, &img.Content); err != nil {
 		if err == gocql.ErrNotFound {
 			return nil, fmt.Errorf("image not found with ID %s", id)
 		}
@@ -66,7 +72,7 @@ func (r *ImageRepository) List() ([]*entity.Image, error) {
 	defer iter.Close()
 
 	for {
-		var img *entity.Image
+		img := &entity.Image{}
 		if !iter.Scan(&img.Id, &img.Name, &img.Date, &img.Content) {
 			break
 		}

@@ -1,10 +1,14 @@
 package entity
 
-import "time"
+import (
+	"time"
+
+	"github.com/gocql/gocql"
+)
 
 type Image struct {
-	Id      string    `json:"id"`
-	Name    string    `json:"name"`
-	Date    time.Time `json:"date"`
-	Content []byte    `json:"content"`
+	Id      gocql.UUID `json:"id"`
+	Name    string     `json:"name"`
+	Date    time.Time  `json:"date"`
+	Content []byte     `json:"content"`
 }
