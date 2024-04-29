@@ -25,11 +25,14 @@ func MakeCreateUserEndpoint(userService *domain.UserService) http.HandlerFunc {
 
 		err := userService.Register(user)
 		if err != nil {
-			fmt.Println("Error:", err)
-			http.Error(w, "Failed to create user", http.StatusInternalServerError)
+			errorResponse := entity.ErrorResponse{Message: fmt.Sprintf("Failed to delete user: %v", err)}
+			responseJSON, _ := json.Marshal(errorResponse)
+
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(responseJSON)
 			return
 		}
-
 		w.Header().Set("Content-Type", "application/json")
 		res := map[string]gocql.UUID{"user_uid": user.Id}
 		if err := json.NewEncoder(w).Encode(res); err != nil {

@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/andrefsilveira1/urban/internal/domain"
+	"github.com/andrefsilveira1/urban/internal/domain/entity"
 	"github.com/gorilla/mux"
 )
 
@@ -17,7 +18,12 @@ func MakeDeleteImageEndpoint(imageService *domain.ImageService) http.HandlerFunc
 
 		err := imageService.Delete(id)
 		if err != nil {
-			http.Error(w, "Failed to delete image", http.StatusInternalServerError)
+			errorResponse := entity.ErrorResponse{Message: fmt.Sprintf("Failed to delete user: %v", err)}
+			responseJSON, _ := json.Marshal(errorResponse)
+
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(responseJSON)
 			return
 		}
 

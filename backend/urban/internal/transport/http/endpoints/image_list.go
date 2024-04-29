@@ -6,14 +6,19 @@ import (
 	"net/http"
 
 	"github.com/andrefsilveira1/urban/internal/domain"
+	"github.com/andrefsilveira1/urban/internal/domain/entity"
 )
 
 func MakeListImageEndpoint(imageService *domain.ImageService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		image, err := imageService.List()
 		if err != nil {
-			fmt.Println("Error", err)
-			http.Error(w, "Failed to list images", http.StatusInternalServerError)
+			errorResponse := entity.ErrorResponse{Message: fmt.Sprintf("Failed to delete user: %v", err)}
+			responseJSON, _ := json.Marshal(errorResponse)
+
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(responseJSON)
 			return
 		}
 
